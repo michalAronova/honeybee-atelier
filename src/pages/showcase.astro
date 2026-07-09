@@ -1,0 +1,82 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Placeholder from "../components/Placeholder.astro";
+import SignatureCakeGrid from "../components/SignatureCakeGrid.tsx";
+import TastingBox from "../components/TastingBox.tsx";
+import { getSignatureCakes, getTastingBox, getTastingFlavors } from "../lib/data";
+
+const cakes = await getSignatureCakes();
+const tastingBox = await getTastingBox();
+const tastingFlavors = await getTastingFlavors();
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Signature Cakes — Honeybee Atelier",
+    itemListElement: cakes.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Product",
+        name: c.name,
+        description: c.description,
+        image: c.image || undefined,
+        offers: { "@type": "Offer", price: c.price, priceCurrency: "USD", availability: c.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" },
+      },
+    })),
+  },
+];
+---
+<Layout
+  active="showcase"
+  title="The Cakes — Order Signature Cakes | Honeybee Atelier"
+  description="Order fixed-price signature celebration cakes online. Click a cake to reveal an illustrated cutaway of its sponges and fillings before you buy."
+  jsonLd={jsonLd}
+>
+  <section class="section--tight" style="padding-top:3.5rem;">
+    <div class="wrap center" style="max-width:60ch;margin-inline:auto;">
+      <span class="kicker">The Cakes</span>
+      <h1>Our signature cakes</h1>
+      <p class="lead" style="margin-inline:auto;">A curated line at set prices, ready to order online. Click any cake to reveal an illustrated cutaway of exactly what's inside — every sponge and filling, from the top tier down.</p>
+    </div>
+  </section>
+
+  {tastingBox && (
+    <section class="section--tight" style="padding-top:1rem;">
+      <div class="wrap">
+        <div class="tasting-band reveal">
+          <div class="tasting-band__media">
+            {tastingBox.image
+              ? <img class="img-cover" src={tastingBox.image} alt="The Honeybee Atelier tasting box — nine mini cakes" width={520} height={520} />
+              : <Placeholder kind="cake" label="Tasting Box" />}
+          </div>
+          <div class="tasting-band__body">
+            <span class="pill pill--gold">Can't choose?</span>
+            <h2>Try the Tasting Box first</h2>
+            <p class="lead">Nine mini cakes in the flavours you'd like to try — credited toward your full-size order within 30 days.</p>
+            <div class="tasting-band__cta">
+              <TastingBox client:load productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" style="padding-top:1rem;">
+    <div class="wrap">
+      {cakes.length === 0
+        ? <p class="center muted">Our cakes are being plated — please check back shortly.</p>
+        : <SignatureCakeGrid client:visible cakes={cakes} />}
+    </div>
+  </section>
+
+  <section class="section--tight band-ivory">
+    <div class="wrap center" style="max-width:58ch;margin-inline:auto;">
+      <h2>Want something entirely your own?</h2>
+      <p class="muted">Start from a blank page and we'll shape an estimate together — size, flavours, fillings, and finish.</p>
+      <a href="/build" class="btn btn-primary">Build your own</a>
+    </div>
+  </section>
+</Layout>

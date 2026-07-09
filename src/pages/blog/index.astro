@@ -1,0 +1,51 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Placeholder from "../../components/Placeholder.astro";
+import { getPosts, fmtDate } from "../../lib/data";
+
+const posts = await getPosts(30);
+---
+<Layout
+  active="blog"
+  title="The Journal — Cake Tips, Techniques & Recipes | Honeybee Atelier"
+  description="Step-by-step techniques, recipes, and cake-care tips from a Certified Pastry Chef — how to store buttercream cakes, build level tiers, choose flavours, and more."
+>
+  <section class="section--tight" style="padding-top:3.5rem;">
+    <div class="wrap center" style="max-width:58ch;margin-inline:auto;">
+      <span class="kicker">The Journal</span>
+      <h1>Tips, techniques &amp; recipes</h1>
+      <p class="lead" style="margin-inline:auto;">A look inside the atelier — how we build, finish, and care for cakes, one stage at a time.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:1rem;">
+    <div class="wrap">
+      {posts.length === 0
+        ? <p class="center muted">New journal entries are on the way.</p>
+        : (
+          <div class="grid grid-3">
+            {posts.map((p) => (
+              <a href={`/blog/${p.slug}`} class="card" style="text-decoration:none;display:flex;flex-direction:column;">
+                <div class="post-card__media ratio-3x2">
+                  {p.cover ? <img class="img-cover" src={p.cover} alt={p.title} width={420} height={280} loading="lazy" /> : <Placeholder kind="bloom" label="Journal" />}
+                </div>
+                <div style="padding:1.4rem;display:flex;flex-direction:column;gap:.6rem;flex:1;">
+                  <span class="post-card__meta">{fmtDate(p.firstPublishedDate)}{p.minutesToRead ? ` · ${p.minutesToRead} min read` : ""}</span>
+                  <h2 style="font-size:1.5rem;">{p.title}</h2>
+                  <p class="muted" style="font-size:.95rem;">{p.excerpt}</p>
+                  <span class="link-underline" style="margin-top:auto;">Read more</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+    </div>
+  </section>
+
+  <section class="section--tight band-blush">
+    <div class="wrap center" style="max-width:52ch;margin-inline:auto;">
+      <h2>Inspired to start your own?</h2>
+      <a href="/build" class="btn btn-primary">Build your own</a>
+    </div>
+  </section>
+</Layout>

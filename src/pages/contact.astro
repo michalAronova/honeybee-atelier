@@ -1,0 +1,91 @@
+---
+import Layout from "../layouts/Layout.astro";
+import InquiryForm from "../components/InquiryForm.tsx";
+import { FORM_IDS } from "../lib/data";
+
+const fields = [
+  { name: "first_name", label: "Name", required: true, half: true },
+  { name: "email", label: "Email", type: "email" as const, required: true, half: true },
+  { name: "phone", label: "Phone", type: "tel" as const, half: true },
+  { name: "subject", label: "Subject", half: true },
+  { name: "message", label: "Message", type: "textarea" as const, required: true },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://www.honeybeeatelier.com/#business",
+    name: "Honeybee Atelier",
+    description: "Boutique cake atelier by a Certified Pastry Chef in Portland, OR.",
+    email: "hello@honeybeeatelier.com",
+    telephone: "+1-503-555-0182",
+    priceRange: "$$$",
+    address: { "@type": "PostalAddress", addressLocality: "Portland", addressRegion: "OR", addressCountry: "US" },
+    openingHours: "Tu-Sa by appointment",
+  },
+];
+---
+<Layout
+  active="contact"
+  title="Contact — Honeybee Atelier, Portland"
+  description="Get in touch with Honeybee Atelier. By appointment in Portland, OR. Please allow at least 7 days' notice (2–4 weeks for weddings and tiered cakes)."
+  jsonLd={jsonLd}
+>
+  <section class="section" style="padding-top:3.5rem;">
+    <div class="wrap split">
+      <div>
+        <span class="kicker">Contact</span>
+        <h1>Let's talk cake</h1>
+        <p class="lead">Questions, custom ideas, or catering — send a note and we'll reply within one business day.</p>
+
+        <div class="info-grid" style="margin-top:2rem;">
+          <div>
+            <h3 style="font-size:1.15rem;">Reach us</h3>
+            <p class="muted"><a class="link-underline" href="mailto:hello@honeybeeatelier.com">hello@honeybeeatelier.com</a><br /><a class="link-underline" href="tel:+15035550182">+1 503-555-0182</a></p>
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem;">Hours</h3>
+            <p class="muted">By appointment<br />Tue – Sat</p>
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem;">Studio</h3>
+            <p class="muted">Portland, OR<br />Pickup &amp; local delivery</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem;padding:1.25rem 1.5rem;background:var(--color-blush-wash);border-color:var(--color-border);">
+          <strong style="font-family:var(--font-display);font-size:1.2rem;">A gentle reminder</strong>
+          <p class="muted" style="margin:.4rem 0 0;">Please share your date early — we take a limited number of commissions each week, and ask for at least 7 days' notice (2–4 weeks for weddings and tiered cakes).</p>
+        </div>
+
+        <div class="map-facade ratio-16x9" style="margin-top:1.5rem;">
+          <button class="map-facade__btn" id="mapBtn" aria-label="Load interactive map of Portland, OR">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s-7-5.2-7-11a7 7 0 1114 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            View map — Portland, OR
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:clamp(1.5rem,3vw,2.25rem);">
+          <h2 style="font-size:1.8rem;">Send a message</h2>
+          <InquiryForm client:visible formId={FORM_IDS.contact} fields={fields} submitLabel="Send a message" />
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+<script>
+  const btn = document.getElementById("mapBtn");
+  btn?.addEventListener("click", () => {
+    const wrap = btn.parentElement!;
+    const iframe = document.createElement("iframe");
+    iframe.src = "https://www.google.com/maps?q=Portland,OR&output=embed";
+    iframe.title = "Map of Portland, OR";
+    iframe.loading = "lazy";
+    iframe.style.cssText = "width:100%;height:100%;border:0;position:absolute;inset:0;";
+    wrap.innerHTML = "";
+    wrap.appendChild(iframe);
+  });
+</script>

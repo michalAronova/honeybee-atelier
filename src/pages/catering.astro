@@ -1,0 +1,28 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CateringBuilder from "../components/CateringBuilder.tsx";
+import { getCateringItems, FORM_IDS } from "../lib/data";
+
+const items = await getCateringItems();
+---
+<Layout
+  active="catering"
+  title="Event Catering — Cookies, Cupcakes & Dessert Tables | Honeybee Atelier"
+  description="Iced cookies, signature cupcakes, and styled dessert tables for weddings, showers, and corporate events in Portland. Build your enquiry in a minute."
+>
+  <section style="padding-top:2.75rem;">
+    <div class="wrap center" style="max-width:60ch;margin-inline:auto;">
+      <span class="kicker">Catering for gatherings</span>
+      <h1 style="margin-bottom:.5rem;">Edible art for your event</h1>
+      <p class="lead" style="margin-inline:auto;">Iced cookies, piped cupcakes, and styled dessert tables — on-brand and arranged on site. Tap the treats you'd like below, add your event details, and we'll send a personalized quote within one business day.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:2rem;" id="enquire">
+    <div class="wrap">
+      {items.length === 0
+        ? <p class="center muted">Our catering menu is being plated — please check back shortly.</p>
+        : <CateringBuilder client:load items={items} formId={FORM_IDS.catering} />}
+    </div>
+  </section>
+</Layout>

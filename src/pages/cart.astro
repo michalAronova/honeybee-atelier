@@ -1,0 +1,18 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CartView from "../components/CartView.tsx";
+---
+<Layout
+  active=""
+  title="Your Cart | Honeybee Atelier"
+  description="Review your signature cakes and proceed to secure checkout."
+  stickyBar={false}
+>
+  <section class="section" style="padding-top:3.5rem;">
+    <div class="wrap">
+      <span class="kicker">Your order</span>
+      <h1 style="margin-bottom:2rem;">Cart</h1>
+      <CartView client:only="react" />
+    </div>
+  </section>
+</Layout>

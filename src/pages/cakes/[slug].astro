@@ -1,0 +1,125 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Placeholder from "../../components/Placeholder.astro";
+import LayerList from "../../components/LayerList.tsx";
+import CakeOrderBox from "../../components/CakeOrderBox.tsx";
+import { getCakeBySlug, getReviews } from "../../lib/data";
+import { WIX_APPS } from "@wix/essentials";
+import { seoTags } from "@wix/seo";
+import { SEO } from "@wix/seo/components";
+import { loadSEOTagsServiceConfig } from "@wix/seo/services";
+
+// Register this product route (sitemap + dashboard SEO editor).
+export const wixMetadata = {
+  appDefId: WIX_APPS.checkoutAndOrders.id,
+  pageIdentifier: WIX_APPS.checkoutAndOrders.productPageMetadata.pageIdentifier,
+  identifiers: { slug: WIX_APPS.checkoutAndOrders.productPageMetadata.identifiers.handle },
+};
+
+const { slug } = Astro.params;
+const cake = await getCakeBySlug(slug!);
+if (!cake) return Astro.redirect("/showcase");
+
+let seoConfig: any = null;
+try {
+  seoConfig = await loadSEOTagsServiceConfig({
+    pageUrl: Astro.url.href,
+    itemType: seoTags.ItemType.STORES_PRODUCT,
+    itemData: { slug: slug! },
+  });
+} catch (e) {
+  console.error("product SEO config failed", e);
+}
+
+const reviews = (await getReviews()).slice(0, 3);
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: cake.name,
+    description: cake.description,
+    image: cake.image || undefined,
+    category: cake.occasion || undefined,
+    brand: { "@type": "Brand", name: "Honeybee Atelier" },
+    offers: {
+      "@type": "Offer",
+      price: cake.price,
+      priceCurrency: "USD",
+      availability: cake.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+  },
+];
+---
+<Layout
+  active="showcase"
+  title={`${cake.name} — Signature Cake | Honeybee Atelier`}
+  description={cake.description || `${cake.name}, a handcrafted signature cake by Honeybee Atelier.`}
+  manualHead={!seoConfig}
+  jsonLd={jsonLd}
+>
+  {seoConfig && <SEO.Tags seoTagsServiceConfig={seoConfig} slot="seo-tags" />}
+
+  <section class="section" style="padding-top:2rem;">
+    <div class="wrap">
+      <a href="/showcase" class="link-underline" style="display:inline-block;margin-bottom:1.5rem;">← All cakes</a>
+      <div class="pdp">
+        <div class="pdp__media">
+          {cake.image
+            ? <img class="img-cover" src={cake.image} alt={`${cake.name} — ${cake.description}`} width={1000} height={1250} fetchpriority="high" />
+            : <Placeholder kind="cake" label={cake.name} />}
+        </div>
+
+        <div class="pdp__info">
+          {cake.occasion && <span class="pill">{cake.occasion}</span>}
+          <h1>{cake.name}</h1>
+          <div class="pdp__price price">${cake.price}</div>
+          {cake.tagline && <p class="lead" style="margin-bottom:1rem;">{cake.tagline}</p>}
+          {cake.description && <p class="muted">{cake.description}</p>}
+
+          <ul class="pdp__meta">
+            {cake.servings != null && <li><span class="label">Serves</span><span>{cake.servings} guests</span></li>}
+            {cake.occasion && <li><span class="label">Perfect for</span><span>{cake.occasion}</span></li>}
+            <li><span class="label">Lead time</span><span>From 7 days</span></li>
+          </ul>
+
+          <div class="pdp__buy">
+            <CakeOrderBox client:load productId={cake.id} price={cake.price} inStock={cake.inStock} />
+            <a href="/build" class="btn btn-ghost pdp__custom">Want it customised?</a>
+          </div>
+
+          {cake.layers?.length > 0 && (
+            <div class="pdp__section">
+              <span class="kicker">What's inside</span>
+              <p class="muted" style="margin-bottom:1rem;">A look at every layer, top to bottom.</p>
+              <LayerList layers={cake.layers} />
+            </div>
+          )}
+
+          <details class="pdp__allergens">
+            <summary>Allergens &amp; dietary</summary>
+            <p class="muted">Made in a kitchen that handles nuts, dairy, gluten, and eggs. We accommodate many dietary needs and can adapt many recipes — tell us what you need when you order, though we cannot guarantee zero cross-contact.</p>
+          </details>
+
+          <p class="muted pdp__note">Prefer something entirely your own? <a href="/build" class="link-underline">Build your own cake →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {reviews.length > 0 && (
+    <section class="section--tight band-blush">
+      <div class="wrap">
+        <div class="center" style="margin-bottom:1.5rem;"><span class="kicker">Words from the table</span></div>
+        <div class="grid grid-3">
+          {reviews.map((r: any) => (
+            <figure class="card" style="padding:1.75rem;margin:0;background:rgba(255,255,255,.6);">
+              <blockquote class="quote" style="margin:0;font-size:1.3rem;">{r.quote}</blockquote>
+              <figcaption class="quote__by">{r.name} · {r.occasion}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>

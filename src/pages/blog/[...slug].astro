@@ -1,0 +1,86 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Placeholder from "../../components/Placeholder.astro";
+import RicosBody from "../../components/RicosBody.tsx";
+import { getPostBySlug, fmtDate } from "../../lib/data";
+import { WIX_APPS } from "@wix/essentials";
+import { seoTags } from "@wix/seo";
+import { SEO } from "@wix/seo/components";
+import { loadSEOTagsServiceConfig } from "@wix/seo/services";
+
+// Register this item route (sitemap + dashboard SEO editor).
+export const wixMetadata = {
+  appDefId: WIX_APPS.blogs.id,
+  pageIdentifier: WIX_APPS.blogs.postPageMetadata.pageIdentifier,
+  identifiers: { slug: WIX_APPS.blogs.postPageMetadata.identifiers.slug },
+};
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug!);
+
+if (!post) return Astro.redirect("/blog");
+
+// Wix-resolved (owner-editable) SEO tags — non-fatal if unavailable.
+let seoConfig: any = null;
+try {
+  seoConfig = await loadSEOTagsServiceConfig({
+    pageUrl: Astro.url.href,
+    itemType: seoTags.ItemType.BLOG_POST,
+    itemData: { slug: slug! },
+  });
+} catch (e) {
+  console.error("SEO tags config failed", e);
+}
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.cover || undefined,
+    datePublished: post.firstPublishedDate || undefined,
+    author: { "@type": "Person", name: "Lydia R." },
+    publisher: { "@type": "Organization", name: "Honeybee Atelier" },
+  },
+];
+---
+<Layout
+  active="blog"
+  title={`${post.title} | Honeybee Atelier Journal`}
+  description={post.excerpt}
+  manualHead={!seoConfig}
+  jsonLd={jsonLd}
+>
+  {seoConfig && <SEO.Tags seoTagsServiceConfig={seoConfig} slot="seo-tags" />}
+
+  <article class="section" style="padding-top:3rem;">
+    <div class="wrap" style="max-width:800px;margin-inline:auto;">
+      <a href="/blog" class="link-underline">← The Journal</a>
+      <span class="post-card__meta" style="display:block;margin-top:1.5rem;">{fmtDate(post.firstPublishedDate)}{post.minutesToRead ? ` · ${post.minutesToRead} min read` : ""}</span>
+      <h1 style="margin-top:.5rem;">{post.title}</h1>
+      {post.excerpt && <p class="lead">{post.excerpt}</p>}
+      <div class="ratio-16x9 card" style="border:none;box-shadow:var(--shadow-soft);margin:1.5rem 0 2.5rem;border-radius:var(--radius);overflow:hidden;">
+        {post.cover ? <img class="img-cover" src={post.cover} alt={post.title} width={800} height={450} /> : <Placeholder kind="bloom" label={post.title} />}
+      </div>
+      <div class="post-body">
+        {post.richContent
+          ? <RicosBody client:only="react" content={post.richContent} />
+          : <p class="muted">This entry is being written.</p>}
+      </div>
+    </div>
+  </article>
+
+  <section class="section--tight band-blush">
+    <div class="wrap center" style="max-width:52ch;margin-inline:auto;">
+      <h2>Ready to plan your cake?</h2>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="/build" class="btn btn-primary">Build your own</a>
+        <a href="/showcase" class="btn btn-ghost">Explore the cakes</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+<style is:global>
+  .ricos-content, .ricos-content p, .ricos-content li, .ricos-content h2, .ricos-content h3, .ricos-content blockquote { color: var(--color-text) !important; }
+</style>

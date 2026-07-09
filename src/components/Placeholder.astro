@@ -1,0 +1,17 @@
+---
+// On-brand themed image fallback (used when a photo isn't available).
+const { label = "", kind = "cake" } = Astro.props;
+const marks: Record<string, string> = {
+  cake: "M4 20h16 M6 20v-5c0-2 2.7-3 6-3s6 1 6 3v5 M8 12V8c0-1.7 1.8-2.5 4-2.5S16 6.3 16 8v4 M12 5.5V3",
+  cookie: "M12 3a9 9 0 100 18 9 9 0 000-18z M9 9v.01 M14 8v.01 M15 13v.01 M10 14v.01 M12 11v.01",
+  hex: "M12 2l7 4v8l-7 4-7-4V6z",
+  bloom: "M12 8a3 3 0 100 6 3 3 0 000-6z M12 2v4 M12 18v4 M2 12h4 M18 12h4 M5 5l3 3 M16 16l3 3 M19 5l-3 3 M8 16l-3 3",
+};
+const d = marks[kind] ?? marks.cake;
+---
+<div class="ph">
+  <svg class="ph__mark" width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d={d} />
+  </svg>
+  {label && <span class="ph__label">{label}</span>}
+</div>

@@ -1,0 +1,260 @@
+{
+  "collections": {
+    "SignatureCakes": {
+      "id": "SignatureCakes",
+      "fields": [
+        "name",
+        "occasion",
+        "servings",
+        "tagline",
+        "layers",
+        "order"
+      ]
+    },
+    "FlavorOptions": {
+      "id": "FlavorOptions",
+      "fields": [
+        "type",
+        "name",
+        "description",
+        "isPremium",
+        "order"
+      ]
+    },
+    "CateringItems": {
+      "id": "CateringItems",
+      "fields": [
+        "name",
+        "category",
+        "priceFrom",
+        "minQuantity",
+        "description",
+        "image",
+        "order"
+      ]
+    },
+    "StoryBlocks": {
+      "id": "StoryBlocks",
+      "fields": [
+        "heading",
+        "body"
+      ]
+    },
+    "Reviews": {
+      "id": "Reviews",
+      "fields": [
+        "name",
+        "quote",
+        "occasion",
+        "order"
+      ]
+    }
+  },
+  "forms": [
+    {
+      "name": "Contact the Atelier",
+      "id": "99f14293-75e7-4f4f-965b-b238882b026a",
+      "targets": [
+        {
+          "target": "first_name",
+          "label": "Name",
+          "required": true
+        },
+        {
+          "target": "email",
+          "label": "Email",
+          "required": true
+        },
+        {
+          "target": "phone",
+          "label": "Phone",
+          "required": false
+        },
+        {
+          "target": "subject",
+          "label": "Subject",
+          "required": false
+        },
+        {
+          "target": "message",
+          "label": "Message",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Build Your Own Estimate",
+      "id": "49199c01-6a2a-43a2-ba70-7f744deafa29",
+      "targets": [
+        {
+          "target": "first_name",
+          "label": "Name",
+          "required": true
+        },
+        {
+          "target": "email",
+          "label": "Email",
+          "required": true
+        },
+        {
+          "target": "phone",
+          "label": "Phone",
+          "required": false
+        },
+        {
+          "target": "occasion",
+          "label": "Occasion",
+          "required": true
+        },
+        {
+          "target": "event_date",
+          "label": "Event date",
+          "required": true
+        },
+        {
+          "target": "servings",
+          "label": "Approx. servings",
+          "required": true
+        },
+        {
+          "target": "cake_details",
+          "label": "Cake details (size, flavours, fillings, finish)",
+          "required": false
+        },
+        {
+          "target": "budget_range",
+          "label": "Budget range",
+          "required": false
+        },
+        {
+          "target": "vision_text",
+          "label": "Tell us your vision",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Catering Inquiry",
+      "id": "0b3c31a9-f6fe-4195-9a48-7176d0c176ed",
+      "targets": [
+        {
+          "target": "first_name",
+          "label": "Name",
+          "required": true
+        },
+        {
+          "target": "email",
+          "label": "Email",
+          "required": true
+        },
+        {
+          "target": "phone",
+          "label": "Phone",
+          "required": false
+        },
+        {
+          "target": "event_type",
+          "label": "Event type",
+          "required": true
+        },
+        {
+          "target": "event_date",
+          "label": "Event date",
+          "required": true
+        },
+        {
+          "target": "guest_count",
+          "label": "Guest count",
+          "required": true
+        },
+        {
+          "target": "items",
+          "label": "Items (cookies / cupcakes / dessert table)",
+          "required": false
+        },
+        {
+          "target": "message",
+          "label": "Message",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "4c94640f-97d7-437d-bc49-918982772864",
+      "slug": "the-golden-hour",
+      "name": "The Golden Hour"
+    },
+    {
+      "id": "c7ac9b06-c1f6-4554-8f66-57a45b334ed9",
+      "slug": "midnight-ganache",
+      "name": "Midnight Ganache"
+    },
+    {
+      "id": "58039148-6578-4e36-a7d6-304270702ef8",
+      "slug": "citrus-cream",
+      "name": "Citrus & Cream"
+    },
+    {
+      "id": "98adb61e-a047-4a3e-868f-cb0c5cb2eb2e",
+      "slug": "blush-peony",
+      "name": "Blush Peony"
+    },
+    {
+      "id": "4be7962a-bc72-4aba-b971-08ad4998682f",
+      "slug": "wild-berry-naked",
+      "name": "Wild Berry Naked"
+    },
+    {
+      "id": "26169a19-db64-432e-8c6a-bffe9ccdaec4",
+      "slug": "pistachio-rose",
+      "name": "Pistachio Rose"
+    },
+    {
+      "id": "2cc87d19-9bd7-4c69-84e1-9d26a1985fed",
+      "slug": "salted-honey",
+      "name": "Salted Honey"
+    },
+    {
+      "id": "99955700-0962-48c8-ae45-dca1eceef2b8",
+      "slug": "earl-grey-fig",
+      "name": "Earl Grey & Fig"
+    },
+    {
+      "id": "99ca7719-b69f-446f-bf51-b81bd6995a7f",
+      "slug": "champagne-celebration",
+      "name": "Champagne Celebration"
+    },
+    {
+      "id": "1d4a7c4a-f485-4d5c-9f7a-4762d0278f42",
+      "slug": "little-lemon",
+      "name": "Little Lemon"
+    }
+  ],
+  "categories": {
+    "Weddings": "14376067-4b0d-4032-8db5-95b3c579a514",
+    "Birthdays": "53d9da8c-4057-4fd1-abaf-2f4032262689",
+    "Celebrations": "e0f238f1-8f12-45c0-bb60-f65f32777a31"
+  },
+  "blogPosts": [
+    {
+      "id": "e4f56964-80b4-4a6f-9c2e-bec7313e6978"
+    },
+    {
+      "id": "372f90ec-0708-4bf7-a37e-1f863ab1d4d0"
+    },
+    {
+      "id": "2fea9170-f1c7-4bcb-9412-b88db16d0be0"
+    },
+    {
+      "id": "c08ecaaa-0bf2-452f-8833-156c8cf1cb53"
+    },
+    {
+      "id": "c6769f1d-4516-4537-b796-6226bc3dc168"
+    },
+    {
+      "id": "834817aa-99ac-4d46-8def-0a10bbe2d23d"
+    }
+  ]
+}

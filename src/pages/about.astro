@@ -1,0 +1,49 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Honeycomb from "../components/Honeycomb.astro";
+import Placeholder from "../components/Placeholder.astro";
+import { getStory } from "../lib/data";
+import pageImages from "../data/page-images.json";
+
+const story = await getStory();
+const img: Record<string, string> = pageImages as any;
+const facts = ["Portland, OR", "By appointment · Tue–Sat", "$$$", "Est. 2021", "Certified Pastry Chef–owned"];
+---
+<Layout
+  active="about"
+  title="About — A Certified Pastry Chef's Atelier | Honeybee Atelier"
+  description="The story behind Honeybee Atelier — a Portland cake studio where a Certified Pastry Chef makes every cake by hand, one commission at a time."
+>
+  <section class="section" style="padding-top:3.5rem;">
+    <div class="wrap split split--wideR">
+      <div class="card ratio-4x5" style="border:none;box-shadow:var(--shadow-soft);">
+        {img.chef ? <img class="img-cover" src={img.chef} alt="The pastry chef at work in the atelier" width={520} height={650} /> : <Placeholder kind="bloom" label="The atelier" />}
+      </div>
+      <div class="story">
+        <span class="kicker">About the atelier</span>
+        <h1>{story?.heading ?? "Made the slow way, only for you"}</h1>
+        {story?.body
+          ? <div set:html={story.body}></div>
+          : <p class="muted">Honeybee Atelier is a Portland cake studio where every cake is made by hand.</p>}
+        <div class="facts" style="margin-top:1.5rem;">
+          {facts.map((f) => <span class="pill">{f}</span>)}
+        </div>
+        <div style="margin-top:1.75rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="/build" class="btn btn-primary">Build your own</a>
+          <a href="/showcase" class="btn btn-ghost">See the cakes</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap"><div class="divider"><Honeycomb width={90} /></div></div>
+  </section>
+
+  <section class="section--tight band-ivory">
+    <div class="wrap center" style="max-width:56ch;margin-inline:auto;">
+      <h2>Patient, precise, and quietly devoted</h2>
+      <p class="muted">Like a honeybee, the work is unhurried and made with care. We take a limited number of commissions each week so every cake gets the attention it deserves.</p>
+    </div>
+  </section>
+</Layout>

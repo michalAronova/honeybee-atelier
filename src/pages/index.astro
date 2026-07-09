@@ -1,8 +1,256 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
----
+import Layout from "../layouts/Layout.astro";
+import Honeycomb from "../components/Honeycomb.astro";
+import Placeholder from "../components/Placeholder.astro";
+import TastingBox from "../components/TastingBox.tsx";
+import ImageRotator from "../components/ImageRotator.tsx";
+import { getSignatureCakes, getReviews, getPosts, getTastingBox, getTastingFlavors, getCateringItems, fmtDate } from "../lib/data";
+import pageImages from "../data/page-images.json";
 
-<Layout>
-	<Welcome />
+const cakes = (await getSignatureCakes()).slice(0, 4);
+const reviews = await getReviews();
+const posts = await getPosts(4);
+const tastingBox = await getTastingBox();
+const tastingFlavors = await getTastingFlavors();
+const cateringItems = await getCateringItems();
+
+const img: Record<string, string> = pageImages as any;
+
+const cateringImages = [
+  ...(img.catering ? [{ url: img.catering, alt: "A styled event dessert table with cupcakes, cookies, and a centerpiece cake" }] : []),
+  ...cateringItems.filter((c: any) => c.imageUrl).map((c: any) => ({ url: c.imageUrl, alt: `${c.name} — ${c.description}` })),
+];
+// one row of photos for the background collage (cycle the available photos)
+const collage = cateringImages.length
+  ? Array.from({ length: 4 }, (_, k) => cateringImages[k % cateringImages.length])
+  : [];
+
+const faqs = [
+  { q: "How far in advance should I order?", a: "At least 7 days for standard cakes, and 2–4 weeks for weddings and tiered cakes. We take a limited number of commissions each week, so the earlier you reach out, the better we can hold your date." },
+  { q: "How much does a custom cake cost?", a: "Our signature cakes have set prices you can order online. Custom cakes are quoted individually based on size, flavors, and finish — fill in the Build Your Own form and we'll send a personalized estimate within one business day." },
+  { q: "Do you accommodate allergies or dietary needs?", a: "Often, yes — we regularly make egg-free, and can adapt many recipes. Our kitchen handles nuts, dairy, gluten, and eggs, so we cannot guarantee zero cross-contact. Tell us your needs when you enquire." },
+  { q: "Can I taste the flavors before ordering?", a: "For weddings and larger commissions we offer tasting boxes by appointment, credited toward your order. Just ask when you request your estimate." },
+  { q: "Do you deliver, or is it pickup only?", a: "Both. Pickup is by appointment at the atelier, and we offer local delivery within the metro area for a fee based on distance and cake size — especially recommended for tiered cakes." },
+  { q: "What's your cancellation policy?", a: "A 50% deposit secures your date and is non-refundable within 7 days of the event. Design changes are welcome up to 5 days before. Full details are on our Ordering & Cancellation Policy page." },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    name: "Honeybee Atelier",
+    description: "Boutique cake atelier crafting couture wedding, birthday, and celebration cakes by a Certified Pastry Chef, plus cookies, cupcakes, and dessert tables for events.",
+    image: img.hero || undefined,
+    email: "hello@honeybeeatelier.com",
+    telephone: "+1-503-555-0182",
+    address: { "@type": "PostalAddress", addressLocality: "Portland", addressRegion: "OR", addressCountry: "US" },
+    priceRange: "$$$",
+    foundingDate: "2021",
+    servesCuisine: "Cakes & Desserts",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  },
+];
+---
+<Layout active="home" jsonLd={jsonLd}>
+  <!-- 1 · HERO -->
+  <section class="hero">
+    <div class="hero__bg">
+      {img.hero
+        ? <img src={img.hero} alt="A three-tier semi-naked buttercream celebration cake with fresh blush roses and gold leaf, on ivory linen in soft daylight" fetchpriority="high" width={1600} height={760} />
+        : <Placeholder kind="cake" label="Honeybee Atelier" />}
+    </div>
+    <div class="hero__scrim"></div>
+    <div class="wrap hero__inner">
+      <div class="hero__content">
+        <Honeycomb width={72} />
+        <span class="kicker anim-fade delay-1">Boutique cake atelier · by a Certified Pastry Chef</span>
+        <h1 class="anim-rise delay-2">Handcrafted perfection for life's golden moments</h1>
+        <p class="lead anim-fade delay-3">Couture wedding, birthday, and celebration cakes — every sponge baked to order, every finish smoothed by hand.</p>
+        <div class="hero__ctas anim-fade delay-3">
+          <a href="/showcase" class="btn btn-primary">Explore the cakes</a>
+          <a href="/build" class="btn btn-ghost">Build your own</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · CHEF'S PROMISE -->
+  <section class="section">
+    <div class="wrap split split--wideR reveal">
+      <div class="card ratio-4x5" style="border:none;box-shadow:var(--shadow-soft);">
+        {img.chef ? <img class="img-cover" src={img.chef} alt="The pastry chef smoothing ivory buttercream in the sunlit atelier" width={520} height={650} loading="lazy" /> : <Placeholder kind="bloom" label="In the atelier" />}
+      </div>
+      <div>
+        <span class="kicker">The chef's promise</span>
+        <h2>One artisan's hands, never a factory</h2>
+        <p class="lead">I'm a Certified Pastry Chef, and I make every cake myself — the slow way. Sponges baked to order, fillings made from scratch, each finish smoothed by hand.</p>
+        <p class="muted">I take a limited number of commissions each week so that no cake is ever rushed. Your golden moment deserves something made with real care, and made only for you.</p>
+        <a href="/about" class="link-underline">Read my story</a>
+      </div>
+    </div>
+    <div class="wrap" style="margin-top:3rem;"><div class="divider"><Honeycomb width={90} /></div></div>
+  </section>
+
+  <!-- 3 · SIGNATURE CAKES PREVIEW -->
+  <section class="section band-ivory">
+    <div class="wrap">
+      <div class="center reveal" style="max-width:56ch;margin-inline:auto;">
+        <span class="kicker">Signature cakes</span>
+        <h2>A curated line, ready to order</h2>
+        <p class="muted">Set prices, ordered online — and each one opens to reveal exactly what's inside.</p>
+      </div>
+      <div class="grid grid-4 reveal" style="margin-top:2.5rem;">
+        {cakes.map((c) => (
+          <a href={`/cakes/${c.slug}`} class="cake-card" style="text-decoration:none;">
+            <div class="cake-card__media ratio-4x5">
+              {c.image ? <img class="img-cover" src={c.image} alt={`${c.name} — ${c.description}`} width={360} height={450} loading="lazy" /> : <Placeholder kind="cake" label={c.name} />}
+              {c.occasion && <span class="pill cake-card__pill">{c.occasion}</span>}
+              <span class="reveal-btn">View cake →</span>
+            </div>
+            <div class="cake-card__body">
+              <div class="cake-card__head"><h3>{c.name}</h3><span class="price">${c.price}</span></div>
+              {c.tagline && <p class="cake-card__tag muted">{c.tagline}</p>}
+              <span class="link-underline" style="margin-top:auto;">View cake</span>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="center" style="margin-top:2.5rem;"><a href="/showcase" class="btn btn-ghost">See all the cakes</a></div>
+    </div>
+  </section>
+
+  <!-- 3.5 · TASTING BOX HIGHLIGHT -->
+  {tastingBox && (
+    <section class="section--tight">
+      <div class="wrap">
+        <div class="tasting-band reveal">
+          <div class="tasting-band__media">
+            {tastingBox.image
+              ? <img class="img-cover" src={tastingBox.image} alt="The Honeybee Atelier tasting box — nine mini cakes" width={520} height={520} loading="lazy" />
+              : <Placeholder kind="cake" label="Tasting Box" />}
+          </div>
+          <div class="tasting-band__body">
+            <span class="pill pill--gold">Can't choose?</span>
+            <h2>Taste before you commit</h2>
+            <p class="lead">Order our <strong>Tasting Box</strong> — nine mini cakes in the flavours you'd like to try — the loveliest way to find your favourite. The full price is credited toward your signature or bespoke cake when you order within 30 days.</p>
+            <div class="tasting-band__cta">
+              <TastingBox client:load productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
+              <a href="/build" class="link-underline">Or dream up your own</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- 4 · HOW A BESPOKE CAKE COMES TO LIFE -->
+  <section class="section">
+    <div class="wrap">
+      <div class="center reveal" style="max-width:52ch;margin-inline:auto;">
+        <span class="kicker">Build your own</span>
+        <h2>How a bespoke cake comes to life</h2>
+      </div>
+      <div class="grid grid-3 reveal" style="margin-top:2.5rem;">
+        {[
+          { n: "01", t: "Choose or dream it up", d: "Start from a signature cake or a blank page. Pick your size, flavours, fillings, and finish." },
+          { n: "02", t: "We shape an estimate together", d: "Share your vision and date and we'll send a personalized estimate within one business day." },
+          { n: "03", t: "Handcrafted and ready for your day", d: "We bake to order — please allow at least 7 days (2–4 weeks for weddings and tiered cakes)." },
+        ].map((s) => (
+          <div class="step card" style="padding:1.75rem;">
+            <div class="step__num">{s.n}</div>
+            <h3 style="margin-top:.5rem;">{s.t}</h3>
+            <p class="muted">{s.d}</p>
+          </div>
+        ))}
+      </div>
+      <div class="center" style="margin-top:2.5rem;"><a href="/build" class="btn btn-primary">Build your own</a></div>
+    </div>
+  </section>
+
+  <!-- 5 · CATERING -->
+  <section class="cater-collage reveal">
+    {collage.length > 0 && (
+      <div class="cater-collage__bg" aria-hidden="true">
+        {collage.map((im) => <img src={im.url} alt="" loading="lazy" />)}
+      </div>
+    )}
+    <div class="cater-collage__scrim" aria-hidden="true"></div>
+    <div class="wrap cater-collage__inner">
+      <div class="cater-collage__text">
+        <span class="kicker">Catering for gatherings</span>
+        <h2>Dessert tables, cookies &amp; cupcakes</h2>
+        <p class="lead">Beautiful, on-brand desserts for weddings, showers, and corporate events — iced cookies, piped cupcakes, and styled dessert tables arranged on site.</p>
+        <a href="/catering" class="btn btn-primary">Explore catering</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · FROM THE JOURNAL -->
+  <section class="section">
+    <div class="wrap">
+      <div class="reveal" style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+        <div><span class="kicker">From the Journal</span><h2>Tips, techniques &amp; recipes</h2></div>
+        <a href="/blog" class="link-underline">Read the journal</a>
+      </div>
+      <div class="rail reveal" style="margin-top:2rem;">
+        {posts.map((p) => (
+          <a href={`/blog/${p.slug}`} class="card" style="text-decoration:none;display:flex;flex-direction:column;">
+            <div class="post-card__media ratio-3x2">
+              {p.cover ? <img class="img-cover" src={p.cover} alt={p.title} width={340} height={227} loading="lazy" /> : <Placeholder kind="bloom" label="Journal" />}
+            </div>
+            <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.5rem;flex:1;">
+              <span class="post-card__meta">{fmtDate(p.firstPublishedDate)}{p.minutesToRead ? ` · ${p.minutesToRead} min read` : ""}</span>
+              <h3 style="font-size:1.4rem;">{p.title}</h3>
+              <span class="link-underline" style="margin-top:auto;">Read more</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · WORDS FROM THE TABLE -->
+  <section class="section band-blush">
+    <div class="wrap">
+      <div class="center reveal"><span class="kicker">Words from the table</span></div>
+      <div class="grid grid-3 reveal" style="margin-top:1.5rem;">
+        {reviews.map((r: any) => (
+          <figure class="card" style="padding:2rem;margin:0;background:rgba(255,255,255,.6);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true" style="opacity:.5;"><path d="M9 7H5a2 2 0 00-2 2v4a2 2 0 002 2h2v-2H5V9h4zm10 0h-4a2 2 0 00-2 2v4a2 2 0 002 2h2v-2h-2V9h4z"/></svg>
+            <blockquote class="quote" style="margin:1rem 0 0;">{r.quote}</blockquote>
+            <figcaption class="quote__by">{r.name} · {r.occasion}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · ORDERING GUIDELINES BAND -->
+  <section class="section--tight band-ivory">
+    <div class="wrap center reveal" style="max-width:60ch;margin-inline:auto;">
+      <span class="kicker">Ordering, simply put</span>
+      <h2>Order at least 7 days ahead</h2>
+      <p class="muted">Weddings and tiered cakes need 2–4 weeks. A 50% deposit secures your date; the balance is due before pickup or delivery. Pickup by appointment at the atelier, with local delivery available across the metro area.</p>
+      <a href="/build#guidelines" class="btn btn-primary" style="margin-top:1rem;">Start your order</a>
+    </div>
+  </section>
+
+  <!-- 9 · FAQ -->
+  <section class="section">
+    <div class="wrap" style="max-width:820px;margin-inline:auto;">
+      <div class="center reveal"><span class="kicker">Questions</span><h2>Good to know</h2></div>
+      <div class="acc reveal" style="margin-top:2rem;">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <div class="acc__body">{f.a}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
 </Layout>

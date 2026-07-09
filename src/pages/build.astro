@@ -1,0 +1,54 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Honeycomb from "../components/Honeycomb.astro";
+import BuildYourOwnConfigurator from "../components/BuildYourOwnConfigurator.tsx";
+import { getFlavors, FORM_IDS } from "../lib/data";
+
+const flavors = (await getFlavors()).map((f: any) => ({ type: f.type, name: f.name, description: f.description, isPremium: !!f.isPremium }));
+
+const guidelines = [
+  { t: "Lead time", d: "Minimum 7 days for standard cakes; 2–4 weeks for weddings and multi-tier commissions. Rush requests are case-by-case." },
+  { t: "Deposit", d: "A 50% deposit secures your date; the balance is due before pickup or delivery. Dates are not held until the deposit is received." },
+  { t: "Fixed vs. custom", d: "Signature cakes have set prices and can be ordered and paid online. Build-Your-Own and catering are quoted individually." },
+  { t: "Pickup & delivery", d: "Pickup by appointment at the atelier; local delivery available within the metro area for a fee, quoted by distance and cake size." },
+  { t: "Changes & cancellations", d: "Design changes accepted up to 5 days before the event; deposits are non-refundable within 7 days of the date." },
+  { t: "Allergens", d: "Made in a kitchen that handles nuts, dairy, gluten, and eggs; we accommodate many dietary needs but cannot guarantee zero cross-contact." },
+];
+---
+<Layout
+  active="build"
+  title="Build Your Own Cake — Request an Estimate | Honeybee Atelier"
+  description="Design a bespoke celebration cake — choose size, flavours, fillings, and finish, watch a live indicative estimate, and request a personalized quote from the atelier."
+>
+  <section class="section--tight" style="padding-top:3.5rem;">
+    <div class="wrap center" style="max-width:60ch;margin-inline:auto;">
+      <span class="kicker">Build your own</span>
+      <h1>Dream it up, and we'll shape it</h1>
+      <p class="lead" style="margin-inline:auto;">Choose your size, sponge, fillings, and finish. A gentle indicative estimate updates as you go — then request a formal quote and we'll reply within one business day.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:1rem;">
+    <div class="wrap">
+      <BuildYourOwnConfigurator client:idle flavors={flavors} formId={FORM_IDS.build} />
+    </div>
+  </section>
+
+  <section class="section band-ivory" id="guidelines">
+    <div class="wrap">
+      <div class="center" style="max-width:52ch;margin-inline:auto;">
+        <span class="kicker">Ordering guidelines</span>
+        <h2>How ordering works</h2>
+        <Honeycomb width={90} />
+      </div>
+      <div class="grid grid-3" style="margin-top:2rem;">
+        {guidelines.map((g) => (
+          <div class="card" style="padding:1.5rem;background:transparent;">
+            <h3 style="font-size:1.35rem;">{g.t}</h3>
+            <p class="muted">{g.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

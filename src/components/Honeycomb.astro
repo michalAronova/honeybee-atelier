@@ -1,0 +1,7 @@
+---
+// Thin gold honeycomb line motif — draws itself once (static under reduced-motion via CSS).
+const { width = 120 } = Astro.props;
+---
+<svg class="honeycomb" width={width} height={Math.round(width * 0.5)} viewBox="0 0 120 60" aria-hidden="true">
+  <path d="M20 30l10-17h20l10 17-10 17H30zM60 30l10-17h20l10 17-10 17H70z" />
+</svg>

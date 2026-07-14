@@ -13,6 +13,9 @@ export default defineConfig({
   security: { checkOrigin: false },
   ...(isBuild && { adapter: cloudProviderFetchAdapter({}) }),
 
+  // inline the (small) page CSS so it isn't a render-blocking request
+  build: { inlineStylesheets: "always" },
+
   image: {
     domains: ["static.wixstatic.com"],
   },

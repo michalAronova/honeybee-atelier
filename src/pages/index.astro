@@ -5,16 +5,26 @@ import Placeholder from "../components/Placeholder.astro";
 import TastingBox from "../components/TastingBox.tsx";
 import ImageRotator from "../components/ImageRotator.tsx";
 import { getSignatureCakes, getReviews, getPosts, getTastingBox, getTastingFlavors, getCateringItems, fmtDate } from "../lib/data";
+import { imgSrc, srcSet } from "../lib/image";
 import pageImages from "../data/page-images.json";
 
-const cakes = (await getSignatureCakes()).slice(0, 4);
-const reviews = await getReviews();
-const posts = await getPosts(4);
-const tastingBox = await getTastingBox();
-const tastingFlavors = await getTastingFlavors();
-const cateringItems = await getCateringItems();
+// fetch everything the homepage needs in parallel (cuts server response time)
+const [cakesAll, reviews, posts, tastingBox, tastingFlavors, cateringItems] = await Promise.all([
+  getSignatureCakes(),
+  getReviews(),
+  getPosts(4),
+  getTastingBox(),
+  getTastingFlavors(),
+  getCateringItems(),
+]);
+const cakes = cakesAll.slice(0, 4);
 
 const img: Record<string, string> = pageImages as any;
+
+// LCP hero image — preload it and let the CDN cache the (visitor-agnostic) HTML
+const heroSizes = "(max-width: 860px) 100vw, 62vw";
+const heroSrcset = img.hero ? srcSet(img.hero, [640, 900, 1300, 1700], 1100 / 760) : "";
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
 
 const cateringImages = [
   ...(img.catering ? [{ url: img.catering, alt: "A styled event dessert table with cupcakes, cookies, and a centerpiece cake" }] : []),
@@ -55,12 +65,12 @@ const jsonLd = [
   },
 ];
 ---
-<Layout active="home" jsonLd={jsonLd}>
+<Layout active="home" jsonLd={jsonLd} preloadImg={img.hero ? { srcset: heroSrcset, sizes: heroSizes } : undefined}>
   <!-- 1 · HERO -->
   <section class="hero">
     <div class="hero__bg">
       {img.hero
-        ? <img src={img.hero} alt="A three-tier semi-naked buttercream celebration cake with fresh blush roses and gold leaf, on ivory linen in soft daylight" fetchpriority="high" width={1600} height={760} />
+        ? <img src={imgSrc(img.hero, 1100, 760)} srcset={heroSrcset} sizes={heroSizes} alt="A three-tier semi-naked buttercream celebration cake with fresh blush roses and gold leaf, on ivory linen in soft daylight" fetchpriority="high" width={1100} height={760} />
         : <Placeholder kind="cake" label="Honeybee Atelier" />}
     </div>
     <div class="hero__scrim"></div>
@@ -82,7 +92,7 @@ const jsonLd = [
   <section class="section">
     <div class="wrap split split--wideR reveal">
       <div class="card ratio-4x5" style="border:none;box-shadow:var(--shadow-soft);">
-        {img.chef ? <img class="img-cover" src={img.chef} alt="The pastry chef smoothing ivory buttercream in the sunlit atelier" width={520} height={650} loading="lazy" /> : <Placeholder kind="bloom" label="In the atelier" />}
+        {img.chef ? <img class="img-cover" src={imgSrc(img.chef, 560, 700)} alt="The pastry chef smoothing ivory buttercream in the sunlit atelier" width={520} height={650} loading="lazy" /> : <Placeholder kind="bloom" label="In the atelier" />}
       </div>
       <div>
         <span class="kicker">The chef's promise</span>
@@ -138,7 +148,7 @@ const jsonLd = [
             <h2>Taste before you commit</h2>
             <p class="lead">Order our <strong>Tasting Box</strong> — nine mini cakes in the flavours you'd like to try — the loveliest way to find your favourite. The full price is credited toward your signature or bespoke cake when you order within 30 days.</p>
             <div class="tasting-band__cta">
-              <TastingBox client:load productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
+              <TastingBox client:idle productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
               <a href="/build" class="link-underline">Or dream up your own</a>
             </div>
           </div>
@@ -175,7 +185,7 @@ const jsonLd = [
   <section class="cater-collage reveal">
     {collage.length > 0 && (
       <div class="cater-collage__bg" aria-hidden="true">
-        {collage.map((im) => <img src={im.url} alt="" loading="lazy" />)}
+        {collage.map((im) => <img src={imgSrc(im.url, 480, 560)} width={480} height={560} alt="" loading="lazy" />)}
       </div>
     )}
     <div class="cater-collage__scrim" aria-hidden="true"></div>

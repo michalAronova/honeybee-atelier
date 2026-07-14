@@ -56,7 +56,7 @@ const jsonLd = [
             <h2>Try the Tasting Box first</h2>
             <p class="lead">Nine mini cakes in the flavours you'd like to try — credited toward your full-size order within 30 days.</p>
             <div class="tasting-band__cta">
-              <TastingBox client:load productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
+              <TastingBox client:idle productId={tastingBox.id} price={tastingBox.price} flavors={tastingFlavors} buttonLabel={`Choose your flavours · $${tastingBox.price}`} />
             </div>
           </div>
         </div>

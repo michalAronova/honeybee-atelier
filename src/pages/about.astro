@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Honeycomb from "../components/Honeycomb.astro";
 import Placeholder from "../components/Placeholder.astro";
 import { getStory } from "../lib/data";
+import { imgSrc } from "../lib/image";
 import pageImages from "../data/page-images.json";
 
 const story = await getStory();
@@ -17,7 +18,7 @@ const facts = ["Portland, OR", "By appointment · Tue–Sat", "$$$", "Est. 2021"
   <section class="section" style="padding-top:3.5rem;">
     <div class="wrap split split--wideR">
       <div class="card ratio-4x5" style="border:none;box-shadow:var(--shadow-soft);">
-        {img.chef ? <img class="img-cover" src={img.chef} alt="The pastry chef at work in the atelier" width={520} height={650} /> : <Placeholder kind="bloom" label="The atelier" />}
+        {img.chef ? <img class="img-cover" src={imgSrc(img.chef, 620, 780)} alt="The pastry chef at work in the atelier" width={520} height={650} fetchpriority="high" /> : <Placeholder kind="bloom" label="The atelier" />}
       </div>
       <div class="story">
         <span class="kicker">About the atelier</span>

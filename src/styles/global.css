@@ -247,7 +247,11 @@ button.link-underline { background: none; border: 0; padding: 0; cursor: pointer
   background: rgba(253,246,243,.95); backdrop-filter: blur(10px); border-top: 1px solid var(--color-border);
   padding: .7rem var(--gutter); gap: .6rem; box-shadow: 0 -12px 30px -24px rgba(42,33,31,.5); }
 .sticky-bar .btn { flex: 1; }
-@media (max-width: 760px) { .sticky-bar { display: flex; } body { padding-bottom: 78px; } }
+@media (max-width: 760px) {
+  .sticky-bar { display: flex; transform: translateY(140%); transition: transform .35s cubic-bezier(.22, 1, .36, 1); }
+  .sticky-bar.is-visible { transform: none; }
+  body { padding-bottom: 78px; }
+}
 
 /* ---------- bands ---------- */
 .band-blush { background: linear-gradient(180deg, var(--color-blush-wash), #f6ece7); }

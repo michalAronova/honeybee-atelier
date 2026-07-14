@@ -49,14 +49,12 @@ export async function getTastingBox() {
 
 /** Signature cakes: Stores products joined to CMS layer/occasion/servings metadata by name. */
 export async function getSignatureCakes(limit = 50): Promise<Cake[]> {
-  let products: any[] = [];
-  try {
-    const res = await productsV3.queryProducts().limit(limit).find();
-    products = (res.items ?? []).filter((p: any) => p.slug !== TASTING_BOX_SLUG);
-  } catch (e) {
-    console.error("products query failed", e);
-  }
-  const meta = await cmsAll("SignatureCakes");
+  // fetch the catalog and the CMS metadata in parallel
+  const [res, meta] = await Promise.all([
+    productsV3.queryProducts().limit(limit).find().catch((e: any) => { console.error("products query failed", e); return { items: [] } as any; }),
+    cmsAll("SignatureCakes"),
+  ]);
+  const products = (res.items ?? []).filter((p: any) => p.slug !== TASTING_BOX_SLUG);
   const byName = new Map(meta.map((m: any) => [m.name, m]));
   return products.map((p: any) => {
     const m: any = byName.get(p.name) ?? {};

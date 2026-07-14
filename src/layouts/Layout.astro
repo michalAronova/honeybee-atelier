@@ -11,6 +11,7 @@ interface Props {
   jsonLd?: object[];
   stickyBar?: boolean;
   manualHead?: boolean;
+  preloadImg?: { srcset: string; sizes: string };
 }
 const {
   title = "Honeybee Atelier — Custom Celebration Cakes, Portland",
@@ -19,6 +20,7 @@ const {
   jsonLd = [],
   stickyBar = true,
   manualHead = true,
+  preloadImg,
 } = Astro.props;
 ---
 <!doctype html>
@@ -26,6 +28,9 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {preloadImg && (
+      <link rel="preload" as="image" imagesrcset={preloadImg.srcset} imagesizes={preloadImg.sizes} fetchpriority="high" />
+    )}
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -44,9 +49,14 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&display=swap"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500&display=swap" />
+    </noscript>
     {jsonLd.map((obj) => (
       <script type="application/ld+json" set:html={JSON.stringify(obj)} />
     ))}
@@ -79,6 +89,15 @@ const {
         { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
       );
       document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      // mobile sticky order bar: only appears once you've scrolled past the hero
+      const bar = document.querySelector(".sticky-bar");
+      if (bar) {
+        const upd = () => bar.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.6);
+        window.addEventListener("scroll", upd, { passive: true });
+        window.addEventListener("resize", upd, { passive: true });
+        upd();
+      }
     </script>
   </body>
 </html>
